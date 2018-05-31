@@ -43,6 +43,7 @@ uint8_t scanned[256];
 
 #include <stm32f4xx_wwdg.h>
 
+void ShowDisplay();
 
 uint8_t read_register(uint8_t address);
 
@@ -121,9 +122,6 @@ int main(void){
 	numero[8]=0x7F;//todos menos o 0x80
 	numero[9]=0x7B;//01+02+08+10+20+40
 
-	int k=0;
-	uint8_t a;
-
 	uint8_t buf[]={0xF5,0XFF};
 	spi_mpu.Assert();
 	spi_mpu.WriteBuffer(buf,1);
@@ -144,7 +142,14 @@ int main(void){
 		spi_sdcard.Release();
 		resp++;
 	}*/
-	int i=0;
+
+/*	uint16_t ACCEL_Z = 0x00;
+	uint8_t ACCEL_ZOUT_H;
+	uint8_t ACCEL_ZOUT_L;
+	uint8_t ACCEL_CONFIG;
+	float gravity = 0;
+	#define ACCEL_MAX 32766*/
+
 	while(1){
 
 		//led_d.Toggle();
@@ -152,27 +157,30 @@ int main(void){
 		//if (GPIOA->IDR & (1<<15)) led_d.Toggle(); //chip select funcionou.
 		//led_c.Toggle();
 
-		while(i<6000000){
-			i++;
-		}
-		i=0;
-		if(k==10){
-			k=0;
-		}
+		//ShoWDisplay();
 
-		a=numero[k];
+		uint8_t buf1[]={0xBF,0X3F};
+		spi_mpu.Assert();
+		spi_mpu.WriteBuffer(buf1,1);
+		ACCEL_ZOUT_H = spi.WriteBuffer(buf1+1,1);
+		spi_mpu.Release();
 
-		i2c_a.WriteRegByte(0x82, 0x04, ~0x04);
-		i2c_a.WriteRegByte(0x82, 0x17, a);
-		i2c_a.WriteRegByte(0x82, 0x13, a);
-		i2c_a.WriteRegByte(0x82, 0x10, a);
+		uint8_t buf2[]={0xC0,0xFF};
+		spi_mpu.Assert();
+		spi_mpu.WriteBuffer(buf2,1);
+		ACCEL_ZOUT_L = spi.WriteBuffer(buf2+1,1);
+		spi_mpu.Release();
 
-		k++;
+		uint8_t buf3[]={0x1C,0X1C};
+		spi_mpu.Assert();
+		spi_mpu.WriteBuffer(buf3,1);
+		ACCEL_CONFIG = spi.WriteBuffer(buf3+1,1);
+		spi_mpu.Release();
 
-		if(ID_BUTTON.Read())
-			led_c.Toggle();
-		else
-			led_c.Off();
+		ACCEL_Z = (ACCEL_ZOUT_H << 8) | (ACCEL_ZOUT_L & 0xFF);
+
+		gravity = ((float)((int)ACCEL_Z))/((int)ACCEL_MAX)*2*9.81;
+
 		//spi_sdcard.Assert();
 		//if (GPIOC->IDR & (1<<12)) led_d.Toggle(); //chip select funcionou.
 		//spi_sdcard.Release();
@@ -188,6 +196,89 @@ int main(void){
 
 
 	}
+}
+
+int CalcAccelX(){
+
+}
+
+int CalcAccelY(){
+
+}
+
+int CalcAccelZ(uint8_t buf1[], uint8_t buf2[], uint8_t buf3[], ){
+
+	uint16_t ACCEL_Z = 0x00;
+	uint8_t ACCEL_ZOUT_H;
+	uint8_t ACCEL_ZOUT_L;
+	uint8_t ACCEL_CONFIG;
+	float gravity = 0;
+	#define ACCEL_MAX 32766
+
+
+	uint8_t buf1[]={0xBF,0X3F};
+	spi_mpu.Assert();
+	spi_mpu.WriteBuffer(buf1,1);
+	ACCEL_ZOUT_H = spi.WriteBuffer(buf1+1,1);
+	spi_mpu.Release();
+
+	uint8_t buf2[]={0xC0,0xFF};
+	spi_mpu.Assert();
+	spi_mpu.WriteBuffer(buf2,1);
+	ACCEL_ZOUT_L = spi.WriteBuffer(buf2+1,1);
+	spi_mpu.Release();
+
+	uint8_t buf3[]={0x1C,0X1C};
+	spi_mpu.Assert();
+	spi_mpu.WriteBuffer(buf3,1);
+	ACCEL_CONFIG = spi.WriteBuffer(buf3+1,1);
+	spi_mpu.Release();
+
+	ACCEL_Z = (ACCEL_ZOUT_H << 8) | (ACCEL_ZOUT_L & 0xFF);
+
+	gravity = ((float)((int)ACCEL_Z))/((int)ACCEL_MAX)*2*9.81;
+
+	return gravity;
+}
+
+void ShowDisplay(){
+	IO_Pin_STM32 ID_BUTTON(IO_Pin::IO_Pin_Mode_IN, GPIOE, GPIO_Pin_2, GPIO_PuPd_UP, GPIO_OType_OD);
+	uint8_t numero[10];
+		numero[0]=0x77;//10+20+40+04+02+01
+		numero[1]=0x60;//20+40
+		numero[2]=0x3D;//10+20+08+04+01
+		numero[3]=0x79;//10+20+40+08+01
+		numero[4]=0x6A;//20+40+08+02
+		numero[5]=0x5B;//10+02+08+40+01
+		numero[6]=0x5F;//10+02+08+40+01+04
+		numero[7]=0x70;//10+20+40
+		numero[8]=0x7F;//todos menos o 0x80
+		numero[9]=0x7B;//01+02+08+10+20+40
+	int k=0;
+	uint8_t a;
+	int i=0;
+	while(i<6000000){
+		i++;
+	}
+	i=0;
+	if(k==10){
+		k=0;
+	}
+
+	a=numero[k];
+
+	i2c_a.WriteRegByte(0x82, 0x04, ~0x04);
+	i2c_a.WriteRegByte(0x82, 0x17, a);
+	i2c_a.WriteRegByte(0x82, 0x13, a);
+	i2c_a.WriteRegByte(0x82, 0x10, a);
+
+	k++;
+
+	if(ID_BUTTON.Read())
+		led_c.Toggle();
+	else
+		led_c.Off();
+
 }
 
 extern uint32_t LocalTime;
