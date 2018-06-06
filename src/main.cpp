@@ -63,7 +63,7 @@ void Timer_Init(){
 
 
   //TIM8
-  RCC_APB1PeriphClockCmd(RCC_APB2Periph_TIM8, ENABLE);
+  RCC_APB2PeriphClockCmd(RCC_APB2Periph_TIM8, ENABLE);
 
 	TIM_TimeBaseInitTypeDef timerInitStructure8;
 	timerInitStructure8.TIM_Prescaler = 29;
@@ -77,7 +77,7 @@ void Timer_Init(){
 
 
 	//TIM1
-	RCC_APB1PeriphClockCmd(RCC_APB2Periph_TIM1, ENABLE);
+	RCC_APB2PeriphClockCmd(RCC_APB2Periph_TIM1, ENABLE);
 
 	TIM_TimeBaseInitTypeDef timerInitStructure1;
 	timerInitStructure1.TIM_Prescaler = 29;
@@ -269,7 +269,7 @@ int main(void){
 
    // testGPIOsON();
 	//testGPIOsOFF();
-
+	//testPWM();
 
     while(1){
 
