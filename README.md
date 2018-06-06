@@ -55,7 +55,7 @@ int ShowNumber(int number);
 
 ## Vídeo demonstrativo
 
-[![Watch the video]()](https://www.youtube.com/watch?v=7FZQyUd2hUc)
+[![Watch the video](https://pbs.twimg.com/media/CWjef37WEAAM-kv.jpg)](https://www.youtube.com/watch?v=7FZQyUd2hUc)
 
 ## Auxílio
 
