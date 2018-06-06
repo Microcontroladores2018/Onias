@@ -25,6 +25,38 @@ Para validação dos pinos foram usadas 6 funções que são responsáveis por a
 
 No display pode ser tanto mostrado um contador de tempo quanto o estado do Debug que a pessoa está, visto que quando a interrupção do botão é acionada, é incrementado uma unidade no valor do display, até que chegue no máximo e resete. 
 
+## Pinagem
+
+Para o projeto o MXCube da ST foi utilizado para auxiliar na escolha das pinagens, mesmo a programação sendo feita com a biblioteca Standard Peripheral. Abaixo estão os pinos utilizados pela placa discovery juntamente com os escolhidos para o projeto SSL.
+
+![PINS_CUBE](PINS_CUBE.JPG)
+
+Destes pinos, os seguintes são pinos GPIOs de input/output: 
+
+![pins_gpio](pins_gpio.JPG)
+
+Quanto aos pinos de SPI, foram usados 2 spis, por causa da diferença de frequência necessária para cada periférico. Para o NRF, foi usado o SPI1, com pinos PA5 a PA7, com uma frequência de cerca de 5MHz de frequencia e o SPI2, para o MPU9250 e o cartão SD, com frequência de 65KHz e pinagem PB13 a PB15. Os pinos I2C usados foram PB8 e PB9. 
+
+Os sinais PWM usados são os Mx_MAH e Mx_MBH, usando os Timers 8 e 1, com os pinos Mx_ENCA e Mx_ENCB, usando os timers 2 a 5. Os pinos analógicos servem para leitura de corrente dos motores, Mx_Cur e VBATREF.
+
+## Funções
+
+Estas são as funções principais dos códigos, que executam o teste de Set e Reset de sinais logicos, envio de sinal PWM e escrevem no display tanto o estado do teste (em qual estado está) ou mostra uma contagem de tempo.
+
+void testLEDs();
+void testGPIOsON();
+void testGPIOsOFF();
+void testPWM();
+void testGPIOsINOn();
+void testGPIOsINOff();
+void testGPIOsANA();
+void ShowCountDownDisplay();
+int ShowNumber(int number);
+
+## Vídeo demonstrativo
+
+[![Watch the video]()](https://www.youtube.com/watch?v=7FZQyUd2hUc)
+
 ## Auxílio
 
 Capitão Renault e a IMBEL FMCE pelo auxílio na montagem da placa
