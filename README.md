@@ -1,30 +1,39 @@
-# Contador de passos com acelerômetro MPU-9250
+# Programa para Teste de Nova Placa Mãe para RoboIME SSL
 
 ### Conceito e Motivação
-O objetivo do projeto é o desenvolvimento de um firmware para contar o número de passos dados por um usuário através do CI MPU-9250 da Invensense. O código deverá ser capaz de ler os valores dos acelerômetros do CI e com tais dados, calcular quantos dados a pessoa deu a partir de certo ponto. Tais passos poderão ser mostrados no display 7-segmentos da contido na placa.
+O objetivo do projeto é auxiliar a montagem das novas placas mãe da SSL (Small Size League). Com um firmware que teste todas as portas usadas pela placa, fica mais simples e rápido identificar bug e falhas tanto de projeto quanto de montagem.
 
-Com esta aplicação, pode-se desenvolver um produto capaz de fornecer ao usuário informações relevantes em sua prática de exercício.
-
-
+Em relação às mudanças feitas em relação à placa anteiror, foi adicionado um MPU-9250, trocados os INA220s por INA169s, adicionado um expansor de porta via I2C STMPE811 para uso de um display 7-seg para mostrar o ID dos robôs e um slot para cartão SD.  
 
 ### Periféricos e Diagrama de Blocos
 
-Para base de produção do fimrware será utilizada uma placa produzida pela RoboIME com suporte da IMBEL-FMCE e uma STM32F4Discovery produzida pela ST. A placa conta com, além do MPU-9250, um extensor de porta STMPE811, via I2C, conectado a um display de 7-segmentos, um botão, dois LEDs e um conector para cartão microSD.
+A placa, bem como os periféricos por ela utilizados estão mostrados abaixo no diaframa de blocos.
 
+![blocos-placa-mae2018](blocos-placa-mae2018.JPG)
 
+## Fluxograma do Firmware
 
-![shield-mpu](shield-mpu.jpg)
+O código segue o seguinte fluxograma:
 
-Os periféricos mencionados se comunicam com o microcontrolador como ilustra o diagrama de blocos na imagem  abaixo.
+![fluxograma](fluxograma.JPG)
 
-![diagrama-de-blocos](diagrama-de-blocos.jpg)
+Os pinos são declarados no início do código, bem como são setados os timers que serão usados nos PWMs e a interrupção por evento externo. 
 
+Na main ocorre o teste dos periféricos via I2C e SPI, respectivamente, o expansor de portas e o MPU-9250 e NRF24L01P. Avaliando registradores que tem valores predefinidos pode-se checar se a comunicação está funcionando.
+
+Para validação dos pinos foram usadas 6 funções que são responsáveis por alterar os valores dos pinos conforme eles serão utilizados normalmente. Os pinos de OUTPUT são levados para HIGH e para LOW, bem como os de INPUT (para debug, considerados OUTPUT). Para teste dos pinos com sinal PWM, ondas quadradas predefinidas são enviadas para esses pinos onde podem ser visualizadas com um osciloscópio. Há também a função para leitura dos pinos análogicos.
+
+No display pode ser tanto mostrado um contador de tempo quanto o estado do Debug que a pessoa está, visto que quando a interrupção do botão é acionada, é incrementado uma unidade no valor do display, até que chegue no máximo e resete. 
+
+## Auxílio
+
+Capitão Renault e a IMBEL FMCE pelo auxílio na montagem da placa
+
+Colegas de turma
 
 ## Referências
 
 [MPU-9250 Datasheet][mpu]
-
-[Cadência da corrida e como ela pode ajudar][globo-esporte]
 
 [STM32F4Discovery][stm32f4]
 
@@ -34,7 +43,7 @@ Os periféricos mencionados se comunicam com o microcontrolador como ilustra o d
 
 
    [mpu]: <https://www.invensense.com/products/motion-tracking/9-axis/mpu-9250/>
-   [globo-esporte]: <http://globoesporte.globo.com/eu-atleta/saude/noticia/2016/03/voce-sabe-o-que-e-cadencia-da-corrida-e-como-ela-pode-ajudar.html>
+  
    [stm32f4]: <http://www.st.com/en/evaluation-tools/stm32f4discovery.html#sw-tools-scroll>
    [stmpe811]: <https://br.mouser.com/datasheet/2/389/stmpe811-1309299.pdf>
    [markdown-it]: <https://github.com/markdown-it/markdown-it>
