@@ -110,8 +110,13 @@ IO_Pin_STM32 CA(IO_Pin::IO_Pin_Mode_OUT, GPIOD, GPIO_Pin_8, GPIO_PuPd_UP, GPIO_O
 IO_Pin_STM32 CB(IO_Pin::IO_Pin_Mode_OUT, GPIOD, GPIO_Pin_10, GPIO_PuPd_UP, GPIO_OType_PP);
 IO_Pin_STM32 CT(IO_Pin::IO_Pin_Mode_OUT, GPIOB, GPIO_Pin_0, GPIO_PuPd_UP, GPIO_OType_PP);
 
+//SETA PINOS DE SCK, MISO E MOSI COMO OUTPUT PARA TESTE BASICO DE SPI
+//IO_Pin_STM32 CLK2(IO_Pin::IO_Pin_Mode_OUT, GPIOB, GPIO_Pin_13, GPIO_PuPd_UP, GPIO_OType_PP);
+//IO_Pin_STM32 MISO2(IO_Pin::IO_Pin_Mode_OUT, GPIOB, GPIO_Pin_14, GPIO_PuPd_UP, GPIO_OType_PP);
+//IO_Pin_STM32 MOSI2(IO_Pin::IO_Pin_Mode_OUT, GPIOA, GPIO_Pin_15, GPIO_PuPd_UP, GPIO_OType_PP);
+
 //SETANDO GPIOS DE ENTRADA (MAS COMO SAIDA)
-IO_Pin_STM32 MPU_INT(IO_Pin::IO_Pin_Mode_OUT, GPIOB, GPIO_Pin_2, GPIO_PuPd_UP, GPIO_OType_PP);
+//IO_Pin_STM32 MPU_INT(IO_Pin::IO_Pin_Mode_OUT, GPIOB, GPIO_Pin_2, GPIO_PuPd_UP, GPIO_OType_PP);
 IO_Pin_STM32 NRF_IRQ(IO_Pin::IO_Pin_Mode_OUT, GPIOC, GPIO_Pin_5, GPIO_PuPd_UP, GPIO_OType_PP);
 IO_Pin_STM32 S2(IO_Pin::IO_Pin_Mode_OUT, GPIOC, GPIO_Pin_11, GPIO_PuPd_UP, GPIO_OType_PP);
 IO_Pin_STM32 S1(IO_Pin::IO_Pin_Mode_OUT, GPIOD, GPIO_Pin_1, GPIO_PuPd_UP, GPIO_OType_PP);
@@ -266,73 +271,122 @@ void InitPWM(){
 	TIM_Cmd(TIM9, ENABLE);
 }
 
-void ConfigADC(){
-	  ADC_InitTypeDef       ADC_InitStructure;
-	  ADC_CommonInitTypeDef ADC_CommonInitStructure;
-	  //DMA_InitTypeDef       DMA_InitStructure;
-	  GPIO_InitTypeDef      GPIO_InitStructure;
-	  /* Enable ADCx, DMA and GPIO clocks ****************************************/
-	  RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_DMA2, ENABLE);
-	  RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE);
-	  RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, ENABLE);
-	  RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOC, ENABLE);
-	  RCC_APB2PeriphClockCmd(RCC_APB2Periph_ADC1, ENABLE);
-	  /* Configure ADC3 Channelx pin as analog input ******************************/
-	  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0;
-	  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AN;
-	  GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL ;
-	  GPIO_Init(GPIOC, &GPIO_InitStructure);
-	  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0;
-	  GPIO_Init(GPIOB, &GPIO_InitStructure);
+void configADC(){
+	ADC_InitTypeDef       ADC_InitStructure;
+	ADC_CommonInitTypeDef ADC_CommonInitStructure;
+	DMA_InitTypeDef       DMA_InitStructure;
 
-	  /* DMA2 Stream0 channel0 configuration **************************************/
-	  DMA_InitTypeDef DMA_InitStructure;
-	  DMA_InitStructure.DMA_Channel = DMA_Channel_0;
-	  DMA_InitStructure.DMA_Memory0BaseAddr = (uint32_t)&ADCConvertedValue;
-	  DMA_InitStructure.DMA_PeripheralBaseAddr = (uint32_t)&(ADC1->DR);
-	  DMA_InitStructure.DMA_DIR = DMA_DIR_PeripheralToMemory;
-	  DMA_InitStructure.DMA_BufferSize = 2;
-	  DMA_InitStructure.DMA_PeripheralInc = DMA_PeripheralInc_Disable;
-	  DMA_InitStructure.DMA_MemoryInc = DMA_MemoryInc_Enable;
-	  DMA_InitStructure.DMA_PeripheralDataSize = DMA_PeripheralDataSize_HalfWord;
-	  DMA_InitStructure.DMA_MemoryDataSize = DMA_MemoryDataSize_HalfWord;
-	  DMA_InitStructure.DMA_Mode = DMA_Mode_Circular;
-	  DMA_InitStructure.DMA_Priority = DMA_Priority_High;
-	  DMA_InitStructure.DMA_FIFOMode = DMA_FIFOMode_Enable;
-	  DMA_InitStructure.DMA_FIFOThreshold = DMA_FIFOThreshold_HalfFull;
-	  DMA_InitStructure.DMA_MemoryBurst = DMA_MemoryBurst_Single;
-	  DMA_InitStructure.DMA_PeripheralBurst = DMA_PeripheralBurst_Single;
-	  DMA_Init(DMA2_Stream0, &DMA_InitStructure);
-	  /* DMA2_Stream0 enable */
-	  DMA_Cmd(DMA2_Stream0, ENABLE);
+	/* Enable peripheral clocks *************************************************/
+	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_DMA2, ENABLE);
+	RCC_APB2PeriphClockCmd(ADCx_CLK, ENABLE);
 
-	  /* ADC Common Init **********************************************************/
-	  ADC_CommonInitStructure.ADC_Mode = ADC_Mode_Independent;
-	  ADC_CommonInitStructure.ADC_Prescaler = ADC_Prescaler_Div2;
-	  ADC_CommonInitStructure.ADC_DMAAccessMode = ADC_DMAAccessMode_Disabled;//ADC_DMAAccessMode_2;//ADC_Direct_memory_access_mode_for_multi_mode
-	  ADC_CommonInitStructure.ADC_TwoSamplingDelay = ADC_TwoSamplingDelay_5Cycles;
-	  ADC_CommonInit(&ADC_CommonInitStructure);
-	  /* ADC1 Init ****************************************************************/
-	  ADC_InitStructure.ADC_Resolution = ADC_Resolution_12b;
-	  ADC_InitStructure.ADC_ScanConvMode = ENABLE;
-	  ADC_InitStructure.ADC_ContinuousConvMode = ENABLE;
-	  ADC_InitStructure.ADC_ExternalTrigConvEdge = ADC_ExternalTrigConvEdge_None;
-	  ADC_InitStructure.ADC_ExternalTrigConv = ADC_ExternalTrigConv_T1_CC1;
-	  ADC_InitStructure.ADC_DataAlign = ADC_DataAlign_Right;
-	  ADC_InitStructure.ADC_NbrOfConversion = 2;
-	  ADC_Init(ADC1, &ADC_InitStructure);
+	/* ADC Common Init **********************************************************/
+	ADC_CommonInitStructure.ADC_Mode = ADC_Mode_Independent;
+	ADC_CommonInitStructure.ADC_Prescaler = ADC_Prescaler_Div2;
+	ADC_CommonInitStructure.ADC_DMAAccessMode = ADC_DMAAccessMode_Disabled;
+	ADC_CommonInitStructure.ADC_TwoSamplingDelay = ADC_TwoSamplingDelay_5Cycles;
+	ADC_CommonInit(&ADC_CommonInitStructure);
 
-	  /* ADC1 regular channels 10, 11 configuration */
-	  ADC_RegularChannelConfig(ADC1, ADC_Channel_10, 1, ADC_SampleTime_3Cycles);
-	  ADC_RegularChannelConfig(ADC1, ADC_Channel_8, 3, ADC_SampleTime_3Cycles);
-	  /* Enable DMA request after last transfer (Single-ADC mode) */
-	  ADC_DMARequestAfterLastTransferCmd(ADC1, ENABLE);
-	  /* Enable ADC1 DMA */
-	  ADC_DMACmd(ADC1, ENABLE);
-	  /* Enable ADC1 */
-	  ADC_Cmd(ADC1, ENABLE);
-	  ADC_SoftwareStartConv(ADC1);
+	/* ADC1 Init ****************************************************************/
+	ADC_InitStructure.ADC_Resolution = ADC_Resolution_12b;
+	ADC_InitStructure.ADC_ScanConvMode = DISABLE;
+	ADC_InitStructure.ADC_ContinuousConvMode = ENABLE;
+	ADC_InitStructure.ADC_ExternalTrigConvEdge = ADC_ExternalTrigConvEdge_None;
+	ADC_InitStructure.ADC_ExternalTrigConv = ADC_ExternalTrigConv_T1_CC1;
+	ADC_InitStructure.ADC_DataAlign = ADC_DataAlign_Right;
+	ADC_InitStructure.ADC_NbrOfConversion = 1;
+	ADC_Init(ADCx, &ADC_InitStructure);
+
+	/* Enable ADC1 DMA */
+	ADC_DMACmd(ADCx, ENABLE);
+
+	/* ADC1 regular channel18 (VBAT) configuration ******************************/
+	ADC_RegularChannelConfig(ADCx, ADC_Channel_Vbat, 1, ADC_SampleTime_15Cycles);
+
+	/* Enable VBAT channel */
+	ADC_VBATCmd(ENABLE);
+
+	/* Enable DMA request after last transfer (Single-ADC mode) */
+	ADC_DMARequestAfterLastTransferCmd(ADCx, ENABLE);
+
+	/* Enable ADC1 **************************************************************/
+	ADC_Cmd(ADCx, ENABLE);
+
+
 }
+
+void Config_ADC(){
+
+	RCC_APB2PeriphClockCmd(RCC_APB2Periph_ADC1, ENABLE);
+    RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE);
+    RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOC, ENABLE);
+
+
+ADC_InitTypeDef       ADC_InitStructure;
+  ADC_CommonInitTypeDef ADC_CommonInitStructure;
+  //DMA_InitTypeDef       DMA_InitStructure;
+  GPIO_InitTypeDef      GPIO_InitStructure;
+  /* Enable ADCx, DMA and GPIO clocks ****************************************/
+  RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_DMA2, ENABLE);
+
+
+  /* Configure ADC3 Channelx pin as analog input ******************************/
+  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0;
+  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AN;
+  GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL ;
+  GPIO_Init(GPIOC, &GPIO_InitStructure);
+  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0;
+  GPIO_Init(GPIOB, &GPIO_InitStructure);
+
+  /* DMA2 Stream0 channel0 configuration **************************************/
+  DMA_InitTypeDef DMA_InitStructure;
+  DMA_InitStructure.DMA_Channel = DMA_Channel_0;
+  DMA_InitStructure.DMA_Memory0BaseAddr = (uint32_t)&ADCConvertedValue;
+  DMA_InitStructure.DMA_PeripheralBaseAddr = (uint32_t)&(ADC1->DR);
+  DMA_InitStructure.DMA_DIR = DMA_DIR_PeripheralToMemory;
+  DMA_InitStructure.DMA_BufferSize = 2;
+  DMA_InitStructure.DMA_PeripheralInc = DMA_PeripheralInc_Disable;
+  DMA_InitStructure.DMA_MemoryInc = DMA_MemoryInc_Enable;
+  DMA_InitStructure.DMA_PeripheralDataSize = DMA_PeripheralDataSize_HalfWord;
+  DMA_InitStructure.DMA_MemoryDataSize = DMA_MemoryDataSize_HalfWord;
+  DMA_InitStructure.DMA_Mode = DMA_Mode_Circular;
+  DMA_InitStructure.DMA_Priority = DMA_Priority_High;
+  DMA_InitStructure.DMA_FIFOMode = DMA_FIFOMode_Enable;
+  DMA_InitStructure.DMA_FIFOThreshold = DMA_FIFOThreshold_HalfFull;
+  DMA_InitStructure.DMA_MemoryBurst = DMA_MemoryBurst_Single;
+  DMA_InitStructure.DMA_PeripheralBurst = DMA_PeripheralBurst_Single;
+  DMA_Init(DMA2_Stream0, &DMA_InitStructure);
+  /* DMA2_Stream0 enable */
+  DMA_Cmd(DMA2_Stream0, ENABLE);
+
+  /* ADC Common Init **********************************************************/
+  ADC_CommonInitStructure.ADC_Mode = ADC_Mode_Independent;
+  ADC_CommonInitStructure.ADC_Prescaler = ADC_Prescaler_Div2;
+  ADC_CommonInitStructure.ADC_DMAAccessMode = ADC_DMAAccessMode_Disabled;//ADC_DMAAccessMode_2;//ADC_Direct_memory_access_mode_for_multi_mode
+  ADC_CommonInitStructure.ADC_TwoSamplingDelay = ADC_TwoSamplingDelay_5Cycles;
+  ADC_CommonInit(&ADC_CommonInitStructure);
+  /* ADC1 Init ****************************************************************/
+  ADC_InitStructure.ADC_Resolution = ADC_Resolution_12b;
+  ADC_InitStructure.ADC_ScanConvMode = ENABLE;
+  ADC_InitStructure.ADC_ContinuousConvMode = ENABLE;
+  ADC_InitStructure.ADC_ExternalTrigConvEdge = ADC_ExternalTrigConvEdge_None;
+  ADC_InitStructure.ADC_ExternalTrigConv = ADC_ExternalTrigConv_T1_CC1;
+  ADC_InitStructure.ADC_DataAlign = ADC_DataAlign_Right;
+  ADC_InitStructure.ADC_NbrOfConversion = 2;
+  ADC_Init(ADC1, &ADC_InitStructure);
+
+  /* ADC1 regular channels 10, 11 configuration */
+  ADC_RegularChannelConfig(ADC1, ADC_Channel_10, 1, ADC_SampleTime_3Cycles);
+  ADC_RegularChannelConfig(ADC1, ADC_Channel_8, 3, ADC_SampleTime_3Cycles);
+  /* Enable DMA request after last transfer (Single-ADC mode) */
+  ADC_DMARequestAfterLastTransferCmd(ADC1, ENABLE);
+  /* Enable ADC1 DMA */
+  ADC_DMACmd(ADC1, ENABLE);
+  /* Enable ADC1 */
+  ADC_Cmd(ADC1, ENABLE);
+  ADC_SoftwareStartConv(ADC1);
+}
+
 //setando os pinos de data e clock do i2c
 IO_Pin_STM32 I2C_A_SDA_PIN(IO_Pin::IO_Pin_Mode_SPECIAL, GPIOB, GPIO_Pin_9, GPIO_PuPd_NOPULL, GPIO_OType_OD, GPIO_AF_I2C1);
 IO_Pin_STM32 I2C_A_SCL_PIN(IO_Pin::IO_Pin_Mode_SPECIAL, GPIOB, GPIO_Pin_8, GPIO_PuPd_UP, GPIO_OType_OD, GPIO_AF_I2C1);
@@ -377,16 +431,16 @@ int main(void){
 	//IO_Pin_STM32 ID_BUTTON(IO_Pin::IO_Pin_Mode_IN, GPIOE, GPIO_Pin_2, GPIO_PuPd_UP, GPIO_OType_OD);
 
 	//setando os pinos de clock, miso e mosi do SPI.
-	IO_Pin_STM32 SPI_SCK_PIN(IO_Pin::IO_Pin_Mode_SPECIAL, GPIOB, GPIO_Pin_13, GPIO_PuPd_NOPULL, GPIO_OType_PP, GPIO_AF_SPI1);
-	IO_Pin_STM32 SPI_MISO_PIN(IO_Pin::IO_Pin_Mode_SPECIAL, GPIOB, GPIO_Pin_14, GPIO_PuPd_NOPULL, GPIO_OType_PP, GPIO_AF_SPI1);
-	IO_Pin_STM32 SPI_MOSI_PIN(IO_Pin::IO_Pin_Mode_SPECIAL, GPIOA, GPIO_Pin_15, GPIO_PuPd_NOPULL, GPIO_OType_PP, GPIO_AF_SPI1);
+	IO_Pin_STM32 SPI_SCK_PIN(IO_Pin::IO_Pin_Mode_SPECIAL, GPIOB, GPIO_Pin_13, GPIO_PuPd_NOPULL, GPIO_OType_PP, GPIO_AF_SPI2);
+	IO_Pin_STM32 SPI_MISO_PIN(IO_Pin::IO_Pin_Mode_SPECIAL, GPIOB, GPIO_Pin_14, GPIO_PuPd_NOPULL, GPIO_OType_PP, GPIO_AF_SPI2);
+	IO_Pin_STM32 SPI_MOSI_PIN(IO_Pin::IO_Pin_Mode_SPECIAL, GPIOB, GPIO_Pin_15, GPIO_PuPd_NOPULL, GPIO_OType_PP, GPIO_AF_SPI2);
 
 	led_c.On();
 	led_d.On();
 	led_a.On();
 	led_b.On();
 
-	SPI_STM32 spi_mpu(SPI1, MPU9250_CE_PIN);
+	SPI_STM32 spi_mpu(SPI2, MPU9250_CE_PIN);
 	SPI_STM32 spi_sdcard(SPI2, SDCARD_CE_PIN);
 
 	InitPWM();
@@ -401,7 +455,7 @@ int main(void){
 	uint8_t buf[]={0xF5,0XFF};
 	spi_mpu.Assert();
 	spi_mpu.WriteBuffer(buf,1);
-	uint8_t resp = spi.WriteBuffer(buf+1,1);
+	uint8_t resp = spi_mpu.WriteBuffer(buf+1,1);
 	spi_mpu.Release();
 	resp++;
 
@@ -478,7 +532,7 @@ void testPWM(){
 void testGPIOsINOn(){
 	int i=0;
 	//aqui testados como output
-	MPU_INT.Set();
+	//MPU_INT.Set();
 	NRF_IRQ.Set();
 	S2.Set();
 	S1.Set();
@@ -487,7 +541,7 @@ void testGPIOsINOn(){
 void testGPIOsINOff(){
 	int i=0;
 	//aqui testados como output
-	MPU_INT.Reset();
+//	MPU_INT.Reset();
 	NRF_IRQ.Reset();
 	S2.Reset();
 	S1.Reset();
