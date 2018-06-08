@@ -57,37 +57,9 @@ void Timer_Init(){
   TIM_TimeBaseStructure.TIM_Period=4999;
   TIM_TimeBaseInit(TIM6,&TIM_TimeBaseStructure);
 
-
   TIM_ITConfig(TIM6,TIM_IT_Update,ENABLE);
   TIM_Cmd(TIM6,ENABLE);
 
-
-  //TIM8
-  RCC_APB2PeriphClockCmd(RCC_APB2Periph_TIM8, ENABLE);
-
-	TIM_TimeBaseInitTypeDef timerInitStructure8;
-	timerInitStructure8.TIM_Prescaler = 29;
-	timerInitStructure8.TIM_CounterMode = TIM_CounterMode_Up;
-	timerInitStructure8.TIM_Period = 55999;
-	timerInitStructure8.TIM_ClockDivision = TIM_CKD_DIV1;
-	timerInitStructure8.TIM_RepetitionCounter = 0;
-	TIM_TimeBaseInit(TIM8, &timerInitStructure8);
-
-	TIM_Cmd(TIM8, ENABLE);
-
-
-	//TIM1
-	RCC_APB2PeriphClockCmd(RCC_APB2Periph_TIM1, ENABLE);
-
-	TIM_TimeBaseInitTypeDef timerInitStructure1;
-	timerInitStructure1.TIM_Prescaler = 29;
-	timerInitStructure1.TIM_CounterMode = TIM_CounterMode_Up;
-	timerInitStructure1.TIM_Period = 55999;
-	timerInitStructure1.TIM_ClockDivision = TIM_CKD_DIV1;
-	timerInitStructure1.TIM_RepetitionCounter = 0;
-	TIM_TimeBaseInit(TIM1, &timerInitStructure1);
-
-	TIM_Cmd(TIM1, ENABLE);
 }
 
 IO_Pin_STM32 ID_BUTTON(IO_Pin::IO_Pin_Mode_IN, GPIOE, GPIO_Pin_2, GPIO_PuPd_UP, GPIO_OType_OD);
@@ -138,17 +110,7 @@ IO_Pin_STM32 M3_MBL(IO_Pin::IO_Pin_Mode_OUT, GPIOB, GPIO_Pin_12, GPIO_PuPd_UP, G
 IO_Pin_STM32 CA(IO_Pin::IO_Pin_Mode_OUT, GPIOD, GPIO_Pin_8, GPIO_PuPd_UP, GPIO_OType_PP);
 IO_Pin_STM32 CB(IO_Pin::IO_Pin_Mode_OUT, GPIOD, GPIO_Pin_10, GPIO_PuPd_UP, GPIO_OType_PP);
 IO_Pin_STM32 CT(IO_Pin::IO_Pin_Mode_OUT, GPIOB, GPIO_Pin_0, GPIO_PuPd_UP, GPIO_OType_PP);
-/*
-//SETANDO GPIOS DE ENTRADA (MAS COMO SAIDA)
-IO_Pin_STM32 M0_MAH(IO_Pin::IO_Pin_Mode_OUT, GPIOC, GPIO_Pin_9, GPIO_PuPd_UP, GPIO_OType_PP);
-IO_Pin_STM32 M0_MBH(IO_Pin::IO_Pin_Mode_OUT, GPIOC, GPIO_Pin_7, GPIO_PuPd_UP, GPIO_OType_PP);
-IO_Pin_STM32 M1_MAH(IO_Pin::IO_Pin_Mode_OUT, GPIOA, GPIO_Pin_8, GPIO_PuPd_UP, GPIO_OType_PP);
-IO_Pin_STM32 M1_MBH(IO_Pin::IO_Pin_Mode_OUT, GPIOC, GPIO_Pin_8, GPIO_PuPd_UP, GPIO_OType_PP);
-IO_Pin_STM32 M2_MAH(IO_Pin::IO_Pin_Mode_OUT, GPIOC, GPIO_Pin_6, GPIO_PuPd_UP, GPIO_OType_PP);
-IO_Pin_STM32 M2_MBH(IO_Pin::IO_Pin_Mode_OUT, GPIOE, GPIO_Pin_11, GPIO_PuPd_UP, GPIO_OType_PP);
-IO_Pin_STM32 M3_MAH(IO_Pin::IO_Pin_Mode_OUT, GPIOE, GPIO_Pin_14, GPIO_PuPd_UP, GPIO_OType_PP);
-IO_Pin_STM32 M3_MBH(IO_Pin::IO_Pin_Mode_OUT, GPIOE, GPIO_Pin_13, GPIO_PuPd_UP, GPIO_OType_PP);
-*/
+
 //SETANDO GPIOS DE ENTRADA (MAS COMO SAIDA)
 IO_Pin_STM32 MPU_INT(IO_Pin::IO_Pin_Mode_OUT, GPIOB, GPIO_Pin_2, GPIO_PuPd_UP, GPIO_OType_PP);
 IO_Pin_STM32 NRF_IRQ(IO_Pin::IO_Pin_Mode_OUT, GPIOC, GPIO_Pin_5, GPIO_PuPd_UP, GPIO_OType_PP);
@@ -156,11 +118,19 @@ IO_Pin_STM32 S2(IO_Pin::IO_Pin_Mode_OUT, GPIOC, GPIO_Pin_11, GPIO_PuPd_UP, GPIO_
 IO_Pin_STM32 S1(IO_Pin::IO_Pin_Mode_OUT, GPIOD, GPIO_Pin_1, GPIO_PuPd_UP, GPIO_OType_PP);
 
 //SETANDO GPIOS DE PWM
-void SetPWMpins(){
+void InitPWM(){
+
+	//timers
+	RCC_APB2PeriphClockCmd(RCC_APB2Periph_TIM1, ENABLE);
+	RCC_APB2PeriphClockCmd(RCC_APB2Periph_TIM8, ENABLE);
+	RCC_APB2PeriphClockCmd(RCC_APB2Periph_TIM9, ENABLE);
+
+	//pins
 	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE);
 	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOE, ENABLE);
 	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOC, ENABLE);
 
+	//inicializando os pinos
 	GPIO_InitTypeDef gpioStructureA;
 	gpioStructureA.GPIO_Pin = GPIO_Pin_8;
 	gpioStructureA.GPIO_Mode = GPIO_Mode_AF;
@@ -172,14 +142,14 @@ void SetPWMpins(){
 	GPIO_PinAFConfig(GPIOA, GPIO_PinSource8, GPIO_AF_TIM1);
 
 	GPIO_InitTypeDef gpioStructureE;
-	gpioStructureE.GPIO_Pin = GPIO_Pin_11 | GPIO_Pin_13 | GPIO_Pin_14;
+	gpioStructureE.GPIO_Pin = GPIO_Pin_5 | GPIO_Pin_11 | GPIO_Pin_13 | GPIO_Pin_14;
 	gpioStructureE.GPIO_Mode = GPIO_Mode_AF;
 	gpioStructureE.GPIO_Speed = GPIO_Speed_100MHz;
 	gpioStructureE.GPIO_OType = GPIO_OType_PP;
 	gpioStructureE.GPIO_PuPd = GPIO_PuPd_UP;
 
 	GPIO_Init(GPIOE, &gpioStructureE);
-	GPIO_PinAFConfig(GPIOE, GPIO_Pin_11 | GPIO_Pin_13 | GPIO_Pin_14 , GPIO_AF_TIM1);
+	GPIO_PinAFConfig(GPIOE, GPIO_PinSource5 | GPIO_PinSource11 | GPIO_PinSource13 | GPIO_PinSource14 , GPIO_AF_TIM1);
 
 	GPIO_InitTypeDef gpioStructureC;
 	gpioStructureC.GPIO_Pin = GPIO_Pin_6 | GPIO_Pin_7 | GPIO_Pin_8 | GPIO_Pin_9;
@@ -191,9 +161,105 @@ void SetPWMpins(){
 	GPIO_Init(GPIOC, &gpioStructureC);
 	GPIO_PinAFConfig(GPIOC, GPIO_Pin_6 | GPIO_Pin_7 | GPIO_Pin_8 | GPIO_Pin_9, GPIO_AF_TIM8);
 
+	//inicializando os timers
+
+	//TIM8
+	TIM_TimeBaseInitTypeDef TIM_TimeBaseStructure8;
+
+	TIM_TimeBaseStructure8.TIM_ClockDivision=TIM_CKD_DIV1;
+	TIM_TimeBaseStructure8.TIM_CounterMode=TIM_CounterMode_Up;
+	TIM_TimeBaseStructure8.TIM_Prescaler=(SystemCoreClock/20000000)-1;
+	TIM_TimeBaseStructure8.TIM_Period=168000000/168000-1;
+
+	TIM_TimeBaseInit(TIM8, &TIM_TimeBaseStructure8);
+	TIM_OCInitTypeDef TIM_OCInitStructure8;
+	TIM_OCInitStructure8.TIM_OCMode=TIM_OCMode_PWM1;
+
+	TIM_OCInitStructure8.TIM_OutputState  = TIM_OutputState_Enable;
+	TIM_OCInitStructure8.TIM_OutputNState = TIM_OutputNState_Disable;
+	TIM_OCInitStructure8.TIM_Pulse        = 0;
+	TIM_OCInitStructure8.TIM_OCPolarity   = TIM_OCPolarity_Low;
+	TIM_OCInitStructure8.TIM_OCIdleState  = TIM_OCIdleState_Set;
+
+	TIM_OC1Init(TIM8, &TIM_OCInitStructure8);
+	TIM_OC1PreloadConfig(TIM8, TIM_OCPreload_Enable);
+	TIM_OC2Init(TIM8, &TIM_OCInitStructure8);
+	TIM_OC2PreloadConfig(TIM8, TIM_OCPreload_Enable);
+	TIM_OC3Init(TIM8, &TIM_OCInitStructure8);
+	TIM_OC3PreloadConfig(TIM8, TIM_OCPreload_Enable);
+	TIM_OC4Init(TIM8, &TIM_OCInitStructure8);
+	TIM_OC4PreloadConfig(TIM8, TIM_OCPreload_Enable);
+
+	TIM_ARRPreloadConfig(TIM8, ENABLE);
+
+	TIM_Cmd(TIM8, ENABLE);
+	TIM_CtrlPWMOutputs(TIM8,ENABLE);
+
+	//TIM1
+	TIM_TimeBaseInitTypeDef TIM_TimeBaseStructure1;
+
+	TIM_TimeBaseStructure1.TIM_ClockDivision=TIM_CKD_DIV1;
+	TIM_TimeBaseStructure1.TIM_CounterMode=TIM_CounterMode_Up;
+	TIM_TimeBaseStructure1.TIM_Prescaler=(SystemCoreClock/20000000)-1;
+	TIM_TimeBaseStructure1.TIM_Period=168000000/168000-1;
+
+	TIM_TimeBaseInit(TIM1, &TIM_TimeBaseStructure1);
+	TIM_OCInitTypeDef TIM_OCInitStructure1;
+	TIM_OCInitStructure1.TIM_OCMode=TIM_OCMode_PWM1;
+
+	TIM_OCInitStructure1.TIM_OutputState  = TIM_OutputState_Enable;
+	TIM_OCInitStructure1.TIM_OutputNState = TIM_OutputNState_Disable;
+	TIM_OCInitStructure1.TIM_Pulse        = 0;
+	TIM_OCInitStructure1.TIM_OCPolarity   = TIM_OCPolarity_Low;
+	TIM_OCInitStructure1.TIM_OCIdleState  = TIM_OCIdleState_Set;
+
+	TIM_OC1Init(TIM1, &TIM_OCInitStructure1);
+	TIM_OC1PreloadConfig(TIM1, TIM_OCPreload_Enable);
+	TIM_OC2Init(TIM1, &TIM_OCInitStructure1);
+	TIM_OC2PreloadConfig(TIM1, TIM_OCPreload_Enable);
+	TIM_OC3Init(TIM1, &TIM_OCInitStructure1);
+	TIM_OC3PreloadConfig(TIM1, TIM_OCPreload_Enable);
+	TIM_OC4Init(TIM1, &TIM_OCInitStructure1);
+	TIM_OC4PreloadConfig(TIM1, TIM_OCPreload_Enable);
+
+	TIM_ARRPreloadConfig(TIM1, ENABLE);
+
+	TIM_Cmd(TIM1, ENABLE);
+	TIM_CtrlPWMOutputs(TIM1,ENABLE);
+
+	//TIM9
+	TIM_TimeBaseInitTypeDef TIM_TimeBaseStructure9;
+
+	TIM_TimeBaseStructure9.TIM_ClockDivision=TIM_CKD_DIV1;
+	TIM_TimeBaseStructure9.TIM_CounterMode=TIM_CounterMode_Up;
+	TIM_TimeBaseStructure9.TIM_Prescaler=(SystemCoreClock/20000000)-1;
+	TIM_TimeBaseStructure9.TIM_Period=168000000/168000-1;
+
+	TIM_TimeBaseInit(TIM9, &TIM_TimeBaseStructure8);
+	TIM_OCInitTypeDef TIM_OCInitStructure9;
+	TIM_OCInitStructure9.TIM_OCMode=TIM_OCMode_PWM1;
+
+	TIM_OCInitStructure9.TIM_OutputState  = TIM_OutputState_Enable;
+	TIM_OCInitStructure9.TIM_OutputNState = TIM_OutputNState_Disable;
+	TIM_OCInitStructure9.TIM_Pulse        = 0;
+	TIM_OCInitStructure9.TIM_OCPolarity   = TIM_OCPolarity_Low;
+	TIM_OCInitStructure9.TIM_OCIdleState  = TIM_OCIdleState_Set;
+
+	TIM_OC1Init(TIM9, &TIM_OCInitStructure9);
+	TIM_OC1PreloadConfig(TIM9, TIM_OCPreload_Enable);
+	TIM_OC2Init(TIM9, &TIM_OCInitStructure9);
+	TIM_OC2PreloadConfig(TIM9, TIM_OCPreload_Enable);
+	TIM_OC3Init(TIM9, &TIM_OCInitStructure9);
+	TIM_OC3PreloadConfig(TIM9, TIM_OCPreload_Enable);
+	TIM_OC4Init(TIM9, &TIM_OCInitStructure9);
+	TIM_OC4PreloadConfig(TIM9, TIM_OCPreload_Enable);
+
+	TIM_ARRPreloadConfig(TIM9, ENABLE);
+
+	TIM_Cmd(TIM9, ENABLE);
+	TIM_CtrlPWMOutputs(TIM9,ENABLE);
+
 }
-
-
 
 //setando os pinos de data e clock do i2c
 IO_Pin_STM32 I2C_A_SDA_PIN(IO_Pin::IO_Pin_Mode_SPECIAL, GPIOB, GPIO_Pin_9, GPIO_PuPd_NOPULL, GPIO_OType_OD, GPIO_AF_I2C1);
@@ -251,7 +317,7 @@ int main(void){
 	SPI_STM32 spi_mpu(SPI1, MPU9250_CE_PIN);
 	SPI_STM32 spi_sdcard(SPI2, SDCARD_CE_PIN);
 
-	SetPWMpins();
+	InitPWM();
 	Timer_Init();
 
 	ConfigInt();
@@ -269,7 +335,7 @@ int main(void){
 
    // testGPIOsON();
 	//testGPIOsOFF();
-	//testPWM();
+	testPWM();
 
     while(1){
 
@@ -326,36 +392,15 @@ void testLEDs(){
 }
 
 void testPWM(){
-
-	TIM_OCInitTypeDef outputChannelInit;
-	outputChannelInit.TIM_OCMode = TIM_OCMode_PWM1;
-	outputChannelInit.TIM_Pulse = 27000;//(57143+1)*duty/100000 - 1;
-	outputChannelInit.TIM_OutputState = TIM_OutputState_Enable;
-	outputChannelInit.TIM_OCPolarity = TIM_OCPolarity_High;
-
-	TIM_OC1Init(TIM1, &outputChannelInit);
-	TIM_OC1PreloadConfig(TIM1, TIM_OCPreload_Enable);
-	TIM_OC2Init(TIM1, &outputChannelInit);
-	TIM_OC2PreloadConfig(TIM1, TIM_OCPreload_Enable);
-	TIM_OC3Init(TIM1, &outputChannelInit);
-	TIM_OC3PreloadConfig(TIM1, TIM_OCPreload_Enable);
-	TIM_OC4Init(TIM1, &outputChannelInit);
-	TIM_OC4PreloadConfig(TIM1, TIM_OCPreload_Enable);
-
-	TIM_OCInitTypeDef outputChannelInit1 = {0,};
-	outputChannelInit1.TIM_OCMode = TIM_OCMode_PWM1;
-	outputChannelInit1.TIM_Pulse = 27000;//(57143+1)*duty/100000 - 1;
-	outputChannelInit1.TIM_OutputState = TIM_OutputState_Enable;
-	outputChannelInit1.TIM_OCPolarity = TIM_OCPolarity_High;
-
-	TIM_OC1Init(TIM8, &outputChannelInit1);
-	TIM_OC1PreloadConfig(TIM8, TIM_OCPreload_Enable);
-	TIM_OC2Init(TIM8, &outputChannelInit1);
-	TIM_OC2PreloadConfig(TIM8, TIM_OCPreload_Enable);
-	TIM_OC3Init(TIM8, &outputChannelInit1);
-	TIM_OC3PreloadConfig(TIM8, TIM_OCPreload_Enable);
-	TIM_OC4Init(TIM8, &outputChannelInit1);
-	TIM_OC4PreloadConfig(TIM8, TIM_OCPreload_Enable);
+	TIM1->CCR1 = 500;
+	TIM1->CCR2 = 500;
+	TIM1->CCR3 = 500;
+	TIM1->CCR4 = 500;
+	TIM8->CCR1 = 500;
+	TIM8->CCR2 = 500;
+	TIM8->CCR3 = 500;
+	TIM8->CCR4 = 500;
+	TIM9->CCR1 = 500;
 }
 
 void testGPIOsINOn(){
