@@ -50,15 +50,168 @@ void Timer_Init(){
 	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM6, ENABLE);
 
 	TIM_TimeBaseInitTypeDef TIM_TimeBaseStructure;
+
 	TIM_TimeBaseStructure.TIM_ClockDivision=0;
 	TIM_TimeBaseStructure.TIM_CounterMode=TIM_CounterMode_Up;
-	TIM_TimeBaseStructure.TIM_Prescaler=335;
-	TIM_TimeBaseStructure.TIM_Period=4999;
+	TIM_TimeBaseStructure.TIM_Prescaler=83;
+	TIM_TimeBaseStructure.TIM_Period=999;
 	TIM_TimeBaseInit(TIM6,&TIM_TimeBaseStructure);
 
 	TIM_ITConfig(TIM6,TIM_IT_Update, ENABLE);
 	TIM_Cmd(TIM6,ENABLE);
 
+	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2, ENABLE);
+
+	TIM_TimeBaseStructure.TIM_Prescaler=0;
+	TIM_TimeBaseStructure.TIM_Period=0xFFFF;
+
+	TIM_TimeBaseInit(TIM2,&TIM_TimeBaseStructure);
+	TIM_Cmd(TIM2,ENABLE);
+
+	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM3, ENABLE);
+
+
+	TIM_TimeBaseInit(TIM3,&TIM_TimeBaseStructure);
+	TIM_Cmd(TIM3,ENABLE);
+
+	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM4, ENABLE);
+
+	TIM_TimeBaseInit(TIM4,&TIM_TimeBaseStructure);
+	TIM_Cmd(TIM4,ENABLE);
+
+	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM5, ENABLE);
+
+	TIM_TimeBaseInit(TIM5,&TIM_TimeBaseStructure);
+	TIM_Cmd(TIM5,ENABLE);
+
+}
+
+void TimerEncM0_Init(){
+	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, ENABLE);
+
+	GPIO_InitTypeDef GPIO_InitStructure;
+	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
+
+	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_4;
+	GPIO_Init(GPIOB, &GPIO_InitStructure);
+
+	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_5;
+	GPIO_Init(GPIOB, &GPIO_InitStructure);
+
+	GPIO_PinAFConfig(GPIOB, GPIO_PinSource4, GPIO_AF_TIM3);
+	GPIO_PinAFConfig(GPIOB, GPIO_PinSource5, GPIO_AF_TIM3);
+
+	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM3, ENABLE);
+
+	TIM_EncoderInterfaceConfig(TIM3, TIM_EncoderMode_TI12, TIM_ICPolarity_Rising, TIM_ICPolarity_Rising);
+
+	//TIM_DeInit(TIM3);
+
+	TIM_Cmd(TIM3,ENABLE);
+	//TIM_SetCounter(TIM3, (uint32_t) 0);
+	//TIM_SetAutoreload(TIM3, 9999);//0x226=550
+}
+void TimerEncM1_Init(){
+	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, ENABLE);
+	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE);
+
+	GPIO_InitTypeDef GPIO_InitStructure;
+	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
+
+	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_15;
+	GPIO_Init(GPIOA, &GPIO_InitStructure);
+
+	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_3;
+	GPIO_Init(GPIOB, &GPIO_InitStructure);
+
+	GPIO_PinAFConfig(GPIOA, GPIO_PinSource15, GPIO_AF_TIM2);
+	GPIO_PinAFConfig(GPIOB, GPIO_PinSource3, GPIO_AF_TIM2);
+
+	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2, ENABLE);
+//	TIM_InternalClockConfig(TIM2);
+
+	TIM_EncoderInterfaceConfig(TIM2, TIM_EncoderMode_TI12, TIM_ICPolarity_Rising, TIM_ICPolarity_Rising);
+
+	//TIM_DeInit(TIM3);
+
+	TIM_Cmd(TIM2,ENABLE);
+	//TIM_SetCounter(TIM3, (uint32_t) 0);
+	//TIM_SetAutoreload(TIM3, 9999);//0x226=550
+}
+void TimerEncM2_Init(){
+	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE);
+
+	GPIO_InitTypeDef GPIO_InitStructure;
+	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
+
+	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0;
+	GPIO_Init(GPIOA, &GPIO_InitStructure);
+
+	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_1;
+	GPIO_Init(GPIOA, &GPIO_InitStructure);
+
+	GPIO_PinAFConfig(GPIOA, GPIO_PinSource0, GPIO_AF_TIM5);
+	GPIO_PinAFConfig(GPIOA, GPIO_PinSource1, GPIO_AF_TIM5);
+
+	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM5, ENABLE);
+
+	TIM_EncoderInterfaceConfig(TIM5, TIM_EncoderMode_TI12, TIM_ICPolarity_Rising, TIM_ICPolarity_Rising);
+
+
+	//TIM_DeInit(TIM3);
+
+	TIM_Cmd(TIM5,ENABLE);
+	//TIM_SetCounter(TIM3, (uint32_t) 0);
+	//TIM_SetAutoreload(TIM3, 9999);//0x226=550
+}
+void TimerEncM3_Init(){
+	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, ENABLE);
+
+	GPIO_InitTypeDef GPIO_InitStructure;
+	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
+
+	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_6;
+	GPIO_Init(GPIOB, &GPIO_InitStructure);
+
+	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_7;
+	GPIO_Init(GPIOB, &GPIO_InitStructure);
+
+	GPIO_PinAFConfig(GPIOB, GPIO_PinSource6, GPIO_AF_TIM4);
+	GPIO_PinAFConfig(GPIOB, GPIO_PinSource7, GPIO_AF_TIM4);
+
+	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM4, ENABLE);
+
+	TIM_EncoderInterfaceConfig(TIM4, TIM_EncoderMode_TI12, TIM_ICPolarity_Rising, TIM_ICPolarity_Rising);
+
+
+	//TIM_DeInit(TIM3);
+
+	TIM_Cmd(TIM4,ENABLE);
+	//TIM_SetCounter(TIM3, (uint32_t) 0);
+	//TIM_SetAutoreload(TIM3, 9999);//0x226=550
+}
+
+void TIM6_NVIC_Init(){
+	NVIC_InitTypeDef NVIC_InitStructure;
+
+	NVIC_InitStructure.NVIC_IRQChannel = TIM6_DAC_IRQn;
+	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0x0C;
+	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x0C;
+
+	NVIC_Init(&NVIC_InitStructure);
 }
 
 IO_Pin_STM32 ID_BUTTON(IO_Pin::IO_Pin_Mode_IN, GPIOE, GPIO_Pin_2, GPIO_PuPd_UP, GPIO_OType_OD);
@@ -70,8 +223,6 @@ void ConfigInt(){
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_SYSCFG, ENABLE);
 
 	SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOE, EXTI_PinSource2);
-
-	STM_EVAL_PBInit(BUTTON_USER, BUTTON_MODE_EXTI);
 
 
 	EXTI_InitStruct.EXTI_Line = EXTI_Line2;
@@ -117,7 +268,7 @@ IO_Pin_STM32 CT(IO_Pin::IO_Pin_Mode_OUT, GPIOB, GPIO_Pin_0, GPIO_PuPd_UP, GPIO_O
 
 //SETANDO GPIOS DE ENTRADA (MAS COMO SAIDA)
 //IO_Pin_STM32 MPU_INT(IO_Pin::IO_Pin_Mode_OUT, GPIOB, GPIO_Pin_2, GPIO_PuPd_UP, GPIO_OType_PP);
-IO_Pin_STM32 NRF_IRQ(IO_Pin::IO_Pin_Mode_OUT, GPIOC, GPIO_Pin_5, GPIO_PuPd_UP, GPIO_OType_PP);
+//IO_Pin_STM32 NRF_IRQ(IO_Pin::IO_Pin_Mode_OUT, GPIOC, GPIO_Pin_5, GPIO_PuPd_UP, GPIO_OType_PP);
 IO_Pin_STM32 S2(IO_Pin::IO_Pin_Mode_OUT, GPIOC, GPIO_Pin_11, GPIO_PuPd_UP, GPIO_OType_PP);
 IO_Pin_STM32 S1(IO_Pin::IO_Pin_Mode_OUT, GPIOD, GPIO_Pin_1, GPIO_PuPd_UP, GPIO_OType_PP);
 
@@ -278,7 +429,7 @@ void configADC(){
 
 	/* Enable peripheral clocks *************************************************/
 	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_DMA2, ENABLE);
-	RCC_APB2PeriphClockCmd(ADCx_CLK, ENABLE);
+	//RCC_APB2PeriphClockCmd(ADC1_CLK, ENABLE);
 
 	/* ADC Common Init **********************************************************/
 	ADC_CommonInitStructure.ADC_Mode = ADC_Mode_Independent;
@@ -295,22 +446,22 @@ void configADC(){
 	ADC_InitStructure.ADC_ExternalTrigConv = ADC_ExternalTrigConv_T1_CC1;
 	ADC_InitStructure.ADC_DataAlign = ADC_DataAlign_Right;
 	ADC_InitStructure.ADC_NbrOfConversion = 1;
-	ADC_Init(ADCx, &ADC_InitStructure);
+	ADC_Init(ADC1, &ADC_InitStructure);
 
 	/* Enable ADC1 DMA */
-	ADC_DMACmd(ADCx, ENABLE);
+	ADC_DMACmd(ADC1, ENABLE);
 
 	/* ADC1 regular channel18 (VBAT) configuration ******************************/
-	ADC_RegularChannelConfig(ADCx, ADC_Channel_Vbat, 1, ADC_SampleTime_15Cycles);
+	ADC_RegularChannelConfig(ADC1, ADC_Channel_Vbat, 1, ADC_SampleTime_15Cycles);
 
 	/* Enable VBAT channel */
 	ADC_VBATCmd(ENABLE);
 
 	/* Enable DMA request after last transfer (Single-ADC mode) */
-	ADC_DMARequestAfterLastTransferCmd(ADCx, ENABLE);
+	ADC_DMARequestAfterLastTransferCmd(ADC1, ENABLE);
 
 	/* Enable ADC1 **************************************************************/
-	ADC_Cmd(ADCx, ENABLE);
+	ADC_Cmd(ADC1, ENABLE);
 
 
 }
@@ -341,7 +492,7 @@ ADC_InitTypeDef       ADC_InitStructure;
   /* DMA2 Stream0 channel0 configuration **************************************/
   DMA_InitTypeDef DMA_InitStructure;
   DMA_InitStructure.DMA_Channel = DMA_Channel_0;
-  DMA_InitStructure.DMA_Memory0BaseAddr = (uint32_t)&ADCConvertedValue;
+  //DMA_InitStructure.DMA_Memory0BaseAddr = (uint32_t)&ADCConvertedValue;
   DMA_InitStructure.DMA_PeripheralBaseAddr = (uint32_t)&(ADC1->DR);
   DMA_InitStructure.DMA_DIR = DMA_DIR_PeripheralToMemory;
   DMA_InitStructure.DMA_BufferSize = 2;
@@ -402,6 +553,7 @@ void testGPIOsINOff();
 void testGPIOsANA();
 void ShowCountDownDisplay();
 int ShowNumber(int number);
+void controle();
 
 int main(void){
 	LIS3DSH_CSN.Set();
@@ -430,34 +582,59 @@ int main(void){
 	IO_Pin_STM32 SDCARD_CE_PIN(IO_Pin::IO_Pin_Mode_OUT, GPIOD, GPIO_Pin_3, GPIO_PuPd_UP, GPIO_OType_PP);
 	//IO_Pin_STM32 ID_BUTTON(IO_Pin::IO_Pin_Mode_IN, GPIOE, GPIO_Pin_2, GPIO_PuPd_UP, GPIO_OType_OD);
 
-	//setando os pinos de clock, miso e mosi do SPI.
-	IO_Pin_STM32 SPI_SCK_PIN(IO_Pin::IO_Pin_Mode_SPECIAL, GPIOB, GPIO_Pin_13, GPIO_PuPd_NOPULL, GPIO_OType_PP, GPIO_AF_SPI2);
-	IO_Pin_STM32 SPI_MISO_PIN(IO_Pin::IO_Pin_Mode_SPECIAL, GPIOB, GPIO_Pin_14, GPIO_PuPd_NOPULL, GPIO_OType_PP, GPIO_AF_SPI2);
-	IO_Pin_STM32 SPI_MOSI_PIN(IO_Pin::IO_Pin_Mode_SPECIAL, GPIOB, GPIO_Pin_15, GPIO_PuPd_NOPULL, GPIO_OType_PP, GPIO_AF_SPI2);
+	//setando os pinos de clock, miso e mosi do SPI2.
+	IO_Pin_STM32 SPI2_SCK_PIN(IO_Pin::IO_Pin_Mode_SPECIAL, GPIOB, GPIO_Pin_13, GPIO_PuPd_NOPULL, GPIO_OType_PP, GPIO_AF_SPI2);
+	IO_Pin_STM32 SPI2_MISO_PIN(IO_Pin::IO_Pin_Mode_SPECIAL, GPIOB, GPIO_Pin_14, GPIO_PuPd_NOPULL, GPIO_OType_PP, GPIO_AF_SPI2);
+	IO_Pin_STM32 SPI2_MOSI_PIN(IO_Pin::IO_Pin_Mode_SPECIAL, GPIOB, GPIO_Pin_15, GPIO_PuPd_NOPULL, GPIO_OType_PP, GPIO_AF_SPI2);
+
+	SPI_STM32 spi_mpu(SPI2, MPU9250_CE_PIN, SPI_BaudRatePrescaler_128);
+	SPI_STM32 spi_sdcard(SPI2, SDCARD_CE_PIN, SPI_BaudRatePrescaler_128);
+
+	IO_Pin_STM32 SPI1_SCK_PIN(IO_Pin::IO_Pin_Mode_SPECIAL, GPIOA, GPIO_Pin_5, GPIO_PuPd_NOPULL, GPIO_OType_PP, GPIO_AF_SPI1);
+	IO_Pin_STM32 SPI1_MISO_PIN(IO_Pin::IO_Pin_Mode_SPECIAL, GPIOA, GPIO_Pin_6, GPIO_PuPd_NOPULL, GPIO_OType_PP, GPIO_AF_SPI1);
+	IO_Pin_STM32 SPI1_MOSI_PIN(IO_Pin::IO_Pin_Mode_SPECIAL, GPIOA, GPIO_Pin_7, GPIO_PuPd_NOPULL, GPIO_OType_PP, GPIO_AF_SPI1);
+	IO_Pin_STM32 NRF24_SS_PIN(IO_Pin::IO_Pin_Mode_OUT, GPIOD, GPIO_Pin_0, GPIO_PuPd_NOPULL, GPIO_OType_PP);
+	IO_Pin_STM32 NRF24_CE_PIN(IO_Pin::IO_Pin_Mode_OUT, GPIOC, GPIO_Pin_12, GPIO_PuPd_NOPULL, GPIO_OType_PP);
+	IO_Pin_STM32 NRF24_IRQN_PIN(IO_Pin::IO_Pin_Mode_IN, GPIOC, GPIO_Pin_5, GPIO_PuPd_UP, GPIO_OType_OD);
+
+	SPI_STM32 spi_nrf(SPI1, NRF24_SS_PIN, SPI_BaudRatePrescaler_32);
 
 	led_c.On();
 	led_d.On();
 	led_a.On();
 	led_b.On();
 
-	SPI_STM32 spi_mpu(SPI2, MPU9250_CE_PIN);
-	SPI_STM32 spi_sdcard(SPI2, SDCARD_CE_PIN);
 
 	InitPWM();
 	Timer_Init();
 
 	ConfigInt();
 	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_4);
+	TimerEncM0_Init();
+	TimerEncM1_Init();
+	TimerEncM2_Init();
+	TimerEncM3_Init();
 
+	//TESTE NRF24
+	uint8_t buf_nrf[]={0xFF,0XFF};
+	spi_nrf.Assert();
+	spi_nrf.WriteBuffer(buf_nrf,1);
+	uint8_t resp_nrf = spi_nrf.WriteBuffer(buf_nrf+1,1);
+	spi_nrf.Release();
+	resp_nrf++;
+
+	//TESTE STMPE
 	uint8_t i2c_ta_ai = i2c_a.ReadRegByte(0x82, 0x00);
 	i2c_ta_ai++;
 
+
+	//TESTE MPU
 	uint8_t buf[]={0xF5,0XFF};
 	spi_mpu.Assert();
 	spi_mpu.WriteBuffer(buf,1);
-	uint8_t resp = spi_mpu.WriteBuffer(buf+1,1);
+	uint8_t resp_mpu = spi_mpu.WriteBuffer(buf+1,1);
 	spi_mpu.Release();
-	resp++;
+	resp_mpu++;
 
 	// testGPIOsON();
 	//testGPIOsOFF();
@@ -533,7 +710,7 @@ void testGPIOsINOn(){
 	int i=0;
 	//aqui testados como output
 	//MPU_INT.Set();
-	NRF_IRQ.Set();
+	//NRF_IRQ.Set();
 	S2.Set();
 	S1.Set();
 }
@@ -542,12 +719,66 @@ void testGPIOsINOff(){
 	int i=0;
 	//aqui testados como output
 //	MPU_INT.Reset();
-	NRF_IRQ.Reset();
+	//NRF_IRQ.Reset();
 	S2.Reset();
 	S1.Reset();
 }
 
 void testGPIOsANA(){
+
+}
+
+uint16_t encoderCount0[10];
+uint16_t encoderCount1[10];
+uint16_t encoderCount2[10];
+uint16_t encoderCount3[10];
+
+float convert = 2*3.14159265*0.028*1000/(10*400*8);
+
+int speed0[10];
+int speed1[10];
+int speed2[10];
+int speed3[10];
+
+void controle(){
+	int currentCount0, currentSpd;
+	int currentCount1, currentCount2, currentCount3;
+
+	currentCount0 = TIM_GetCounter(TIM3);
+	currentCount1 = TIM_GetCounter(TIM2);
+	currentCount2 = TIM_GetCounter(TIM4);
+	currentCount3 = TIM_GetCounter(TIM5);
+
+	for (int i=9; i>0; i--){
+		encoderCount0[i]=encoderCount0[i-1];
+		speed0[i]=speed0[i-1];
+
+		encoderCount1[i]=encoderCount1[i-1];
+		speed1[i]=speed1[i-1];
+
+		encoderCount2[i]=encoderCount2[i-1];
+		speed2[i]=speed2[i-1];
+
+		encoderCount3[i]=encoderCount3[i-1];
+		speed3[i]=speed3[i-1];
+	}
+
+	encoderCount0[0]=currentCount0;
+	encoderCount1[0]=currentCount1;
+	encoderCount2[0]=currentCount2;
+	encoderCount3[0]=currentCount3;
+
+	currentSpd = 1000*(encoderCount0[0] - encoderCount0[9])*convert; //x1000 para nao ter necessidade de utilizar float
+	speed0[0]=currentSpd;
+
+	currentSpd = 1000*(encoderCount1[0] - encoderCount1[9])*convert; //x1000 para nao ter necessidade de utilizar float
+	speed1[0]=currentSpd;
+
+	currentSpd = 1000*(encoderCount2[0] - encoderCount2[9])*convert; //x1000 para nao ter necessidade de utilizar float
+	speed2[0]=currentSpd;
+
+	currentSpd = 1000*(encoderCount3[0] - encoderCount3[9])*convert; //x1000 para nao ter necessidade de utilizar float
+	speed3[0]=currentSpd;
 
 }
 
@@ -625,15 +856,6 @@ void ShowCountDownDisplay(){
 
 }
 
-
-/*
-extern "C" void TIM6_DAC_IRQHandler(){
-	if(TIM_GetITStatus(TIM6,TIM_IT_Update)){
-		TIM_ClearITPendingBit(TIM6,TIM_IT_Update);
-		CalculaSteps();
-	}
-}*/
-
 int ShowNumber(int number){
 
 	uint8_t numero[10];
@@ -700,6 +922,13 @@ extern "C" void EXTI2_IRQHandler(void) {
 		}
 		// Clear interrupt flag
 		EXTI_ClearITPendingBit(EXTI_Line2);
+	}
+}
+
+extern "C" void TIM6_DAC_IRQHandler(){
+	if(TIM_GetITStatus(TIM6,TIM_IT_Update)){
+		TIM_ClearITPendingBit(TIM6,TIM_IT_Update);
+		controle(); //funcao que atualiza os valores de controle chamada a cada 1ms
 	}
 }
 
